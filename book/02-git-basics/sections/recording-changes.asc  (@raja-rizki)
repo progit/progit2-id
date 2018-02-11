@@ -1,6 +1,6 @@
 === Mencatat Perubahan pada Repositori
 
-Anda memiliki repositori Git yang bonafid dan kasir atau copy pekerjaan dari file untuk proyek itu.
+Anda memiliki repositori Git yang baik dan copy pekerjaan dari file untuk proyek itu.
 Anda perlu membuat beberapa perubahan dan melakukan snapshot perubahan tersebut ke dalam repositori Anda setiap kali proyek mencapai keadaan yang ingin Anda catat.
 
 Ingat bahwa setiap file dalam direktori kerja Anda bisa berada di salah satu dari dua negara bagian: dilacak atau dilewati.
