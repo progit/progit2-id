@@ -1,0 +1,575 @@
+=== Mencatat Perubahan pada Repositori
+
+Anda memiliki repositori Git yang baik dan copy pekerjaan dari file untuk proyek itu.
+Anda perlu membuat beberapa perubahan dan melakukan snapshot perubahan tersebut ke dalam repositori Anda setiap kali proyek mencapai keadaan yang ingin Anda catat.
+
+Ingat bahwa setiap file dalam direktori kerja Anda bisa berada di salah satu dari dua negara bagian: dilacak atau dilewati.
+File yang dilacak adalah file yang ada di snapshot terakhir; mereka dapat dimodifikasi, dimodifikasi, atau dipentaskan.
+File yang tidak dilacak adalah segalanya - file apa pun di direktori kerja Anda yang tidak ada dalam potret terakhir Anda dan tidak berada di area stage Anda.
+Saat pertama kali mengkloning sebuah repositori, semua file Anda akan dilacak dan tidak dimodifikasi karena Anda baru saja memeriksanya dan belum mengedit apapun.
+
+Saat Anda mengedit file, Git melihat mereka sebagai yang dimodifikasi, karena Anda telah mengubahnya sejak komit terakhir Anda.
+Anda memformat file yang dimodifikasi ini dan kemudian melakukan semua perubahan bertahap Anda, dan siklusnya berulang.
+
+Siklus hidup dari status file Anda.
+image::images/lifecycle.png[The lifecycle of the status of your files.]
+
+[[_checking_status]]
+==== Memeriksa Status File Anda
+
+Alat utama yang Anda gunakan untuk menentukan file mana yang statusnya adalah perintah `git status`.(((Perintah git, status)))
+Jika Anda menjalankan perintah ini langsung setelah kloning, Anda harus melihat sesuatu seperti ini:
+
+[source,console]
+----
+$ git status
+On branch master
+nothing to commit, working directory clean
+----
+
+Ini berarti Anda memiliki direktori kerja yang bersih - dengan kata lain, tidak ada file yang dilacak dan dimodifikasi.
+Git juga tidak melihat file yang tidak terlacak, atau mereka akan tercantum di sini.
+Akhirnya, perintah tersebut memberitahukan cabang mana Anda dan memberitahukan bahwa Anda belum menyimpang dari cabang yang sama di server.
+Untuk saat ini, cabang itu selalu ``master'', yang merupakan default; Anda tidak akan khawatir tentang hal ini di sini.
+<<_ git_branching_>> akan membahas cabang dan referensi secara rinci.
+
+Misalkan Anda menambahkan file baru ke proyek Anda, sebuah file README yang sederhana.
+Jika file tersebut tidak ada sebelumnya, dan Anda menjalankan `git status`, Anda melihat file yang tidak terlacak seperti ini:
+
+[source,console]
+----
+$ echo 'My Project' > README
+$ git status
+On branch master
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+    README
+
+nothing added to commit but untracked files present (use "git add" to track)
+----
+
+Anda dapat melihat bahwa file README baru Anda tidak terlacak, karena berada di bawah file `Untracked files '' yang menuju output status Anda.
+Untracked pada dasarnya berarti Git melihat file yang tidak Anda miliki di snapshot sebelumnya (commit); Git tidak akan mulai memasukkannya ke dalam snapshot komit Anda sampai Anda secara eksplisit memberitahukannya untuk melakukannya.
+Hal ini dilakukan agar Anda tidak secara tidak sengaja mulai memasukkan file biner atau file lain yang tidak Anda maksudkan.
+Anda ingin memulai termasuk README, jadi mari kita mulai melacak file.
+
+[[_tracking_files]]
+==== Melacak File Baru
+
+Untuk mulai melacak file baru, Anda menggunakan perintah `git add`.(((Perintah git, tambahkan)))
+Untuk mulai melacak file README, Anda dapat menjalankan ini:
+
+[source,console]
+----
+$ git add README
+----
+
+If you run your status command again, you can see that your README file is now tracked and staged to be committed:
+
+[source,console]
+----
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+
+----
+
+Anda dapat mengetahui bahwa itu dipentaskan karena berada di bawah judul "Perubahan yang akan dilakukan".
+Jika Anda berkomitmen pada saat ini, versi file pada saat Anda menjalankan `git add` adalah apa yang ada dalam snapshot historis.
+Anda mungkin ingat bahwa ketika Anda menjalankan `git init` sebelumnya, Anda kemudian menjalankan `git add (files)`- yaitu mulai melacak file di direktori Anda. ((Perintah git, init)))(((perintah git, menambahkan)))
+Perintah `git add` mengambil nama path untuk file atau direktori; Jika itu adalah sebuah direktori, perintah tersebut menambahkan semua file dalam direktori itu secara rekursif.
+
+==== Memodifikasi Format File
+
+Mari kita ubah file yang sudah dilacak.
+Jika Anda mengubah file yang sebelumnya dilacak yang disebut ``CONTRIBUTING.md'' dan kemudian jalankan perintah `git status` Anda lagi, Anda mendapatkan sesuatu yang terlihat seperti ini:
+
+[source,console]
+----
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+
+----
+
+File ``CONTRIBUTING.md'' muncul di bawah bagian yang bernama ``Berubah tapi tidak dipentaskan untuk komit''- yang berarti bahwa file yang dilacak telah dimodifikasi dalam direktori kerja namun belum dipentaskan.
+Untuk tahap itu, Anda menjalankan perintah `git add`. `git add` adalah perintah serbaguna - Anda menggunakannya untuk mulai melacak file baru, ke file panggung, dan melakukan hal-hal lain seperti menandai file yang berkonflik gabungan seperti yang teratasi. Mungkin akan sangat membantu untuk menganggapnya lebih sebagai ``menambahkan konten ini ke komit berikutnya'' daripada ``menambahkan file ini ke proyek'' (((perintah git, tambahkan)))
+Mari jalankan `git add` sekarang ke stage file ``CONTRIBUTING.md'', dan kemudian jalankan `git status` lagi:
+
+[source,console]
+----
+$ git add CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+    modified:   CONTRIBUTING.md
+
+----
+
+Kedua file dipentaskan dan akan masuk ke komit berikutnya.
+Pada titik ini, misalkan Anda ingat satu perubahan kecil yang ingin Anda buat di `CONTRIBUTING.md` sebelum Anda menghubunginya.
+Anda membukanya lagi dan membuat perubahan itu, dan Anda siap untuk melakukan.
+Namun, mari kita jalankan `git status` sekali lagi:
+
+[source,console]
+----
+$ vim CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+    modified:   CONTRIBUTING.md
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+
+----
+
+Apa apaan?
+Sekarang `CONTRIBUTING.md` terdaftar sebagai stage _and_ unstaged.
+Bagaimana mungkin?
+Ternyata Git memprogram sebuah file persis seperti saat Anda menjalankan perintah `git add`.
+Jika Anda melakukan sekarang, versi `CONTRIBUTING.md` seperti saat Anda terakhir menjalankan perintah` git add` adalah bagaimana ia akan masuk ke komit, bukan versi file seperti yang terlihat di direktori kerja Anda saat Anda jalankan `git commit`
+Jika Anda memodifikasi file setelah menjalankan `git add`, Anda harus menjalankan` git add` lagi untuk tahap versi terbaru file:
+
+[source,console]
+----
+$ git add CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+    modified:   CONTRIBUTING.md
+----
+
+==== Status pendek
+
+Sementara output `git status` cukup komprehensif, ini juga cukup bertele-tele. Git juga memiliki bendera status pendek sehingga Anda bisa melihat perubahan Anda dengan cara yang lebih kompak. Jika Anda menjalankan `git status -s` atau` git status --short` Anda mendapatkan keluaran yang jauh lebih sederhana dari perintah.
+
+[source,console]
+----
+$ git status -s
+ M README
+MM Rakefile
+A  lib/git.rb
+M  lib/simplegit.rb
+?? LICENSE.txt
+----
+
+File baru yang tidak dilacak memiliki `?` di sampingnya, file baru yang telah ditambahkan ke area stage memiliki `A`, file yang dimodifikasi memiliki `M` dan sebagainya. Ada dua kolom pada output - kolom sebelah kiri menunjukkan bahwa file dipentaskan dan kolom sebelah kanan menunjukkan bahwa itu dimodifikasi. Jadi misalnya pada output itu, file `README` dimodifikasi di direktori kerja tapi belum dipentaskan, sedangkan file` lib / simplegit.rb` telah dimodifikasi dan dipentaskan. `Rakefile` dimodifikasi, dipentaskan lalu dimodifikasi lagi, jadi ada perubahan pada keduanya yang dipentaskan dan tidak dipersiapkan.
+
+[[_ignoring]]
+==== Mengabaikan file
+
+Seringkali, Anda akan memiliki kelas file yang Anda tidak ingin Git menambahkan atau bahkan menunjukkan Anda sebagai tidak terlewatkan secara otomatis.
+Ini umumnya file yang dibuat secara otomatis seperti file log atau file yang dihasilkan oleh sistem build Anda.
+Dalam kasus seperti itu, Anda dapat membuat pola daftar file agar sesuai dengan nama mereka `.gitignore`.((((Mengabaikan file)))
+Berikut adalah contoh `.gitignore` file:
+
+[source,console]
+----
+$ cat .gitignore
+*.[oa]
+*~
+----
+
+Baris pertama memberitahu Git untuk mengabaikan file yang berakhiran `` .o '' atau `` .a '' - objek dan arsipkan file yang mungkin merupakan produk dari pembuatan kode Anda.
+Baris kedua memberitahu Git untuk mengabaikan semua file yang diakhiri dengan tilde (`~`), yang digunakan oleh banyak editor teks seperti Emacs untuk menandai file sementara.
+Anda mungkin juga menyertakan direktori log, tmp, atau pid; dokumentasi yang dihasilkan secara otomatis; dan seterusnya.
+Menyiapkan file `.gitignore` sebelum Anda memulai umumnya adalah ide bagus sehingga Anda tidak sengaja melakukan file yang sebenarnya tidak Anda inginkan di gudang Git Anda.
+
+Aturan untuk pola yang dapat Anda masukkan ke dalam file `gitignore` adalah sebagai berikut:
+
+* Garis kosong atau garis yang diawali dengan `#` diabaikan.
+* Standar pola glob bekerja.
+* Anda bisa mengakhiri pola dengan garis miring (`/`) untuk menentukan direktori.
+* Anda bisa meniadakan sebuah pola dengan memulainya dengan tanda seru (`!`).
+
+Pola Glob seperti ekspresi reguler sederhana yang digunakan kerang.
+Tanda asterisk (`*`) cocok dengan karakter nol atau lebih; `[abc]` cocok dengan karakter apa pun di dalam tanda kurung (dalam hal ini a, b, atau c); tanda tanya (`?`) cocok dengan satu karakter; dan kurung yang menyertakan karakter yang dipisahkan oleh tanda hubung (`[0-9]`) cocok dengan karakter di antara keduanya (dalam hal ini 0 sampai 9).
+Anda juga dapat menggunakan dua tanda bintang untuk mencocokkan direktori bersarang; `a/**/z` akan cocok dengan `a/z`, `a/b/z`, `a/b/c/z`, dan seterusnya.
+
+Berikut adalah contoh lain. Gitignore file:
+
+[source]
+----
+# no .a files
+*.a
+
+# but do track lib.a, even though you're ignoring .a files above
+!lib.a
+
+# only ignore the root TODO file, not subdir/TODO
+/TODO
+
+# ignore all files in the build/ directory
+build/
+
+# ignore doc/notes.txt, but not doc/server/arch.txt
+doc/*.txt
+
+# ignore all .txt files in the doc/ directory
+doc/**/*.txt
+----
+
+[TIP]
+====
+GitHub mempertahankan daftar file `gitHoreignore` yang cukup lengkap untuk puluhan atau proyek dan bahasa di https://github.com/github/gitignore[] jika Anda menginginkan titik awal untuk proyek Anda.
+====
+
+[[_git_diff_staged]]
+==== Melihat Perubahan Staged dan Unstaged Anda
+
+Jika perintah `git status` terlalu samar untuk Anda - Anda ingin tahu persis apa yang Anda ubah, bukan hanya file mana yang diubah - Anda dapat menggunakan perintah` git diff`.(((Perintah git, diff)))
+Kita akan membahas `git diff` secara lebih rinci nanti, tapi mungkin Anda paling sering menggunakannya untuk menjawab dua pertanyaan berikut: Apa yang telah Anda ubah tapi belum dipentaskan?
+Dan apa yang telah Anda rencanakan yang akan Anda lakukan?
+Meskipun `git status` menjawab pertanyaan-pertanyaan itu secara umum dengan mencantumkan nama file,` git diff` menunjukkan garis yang tepat ditambahkan dan dihapus - patchnya, seperti dulu.
+
+Misalkan Anda mengedit dan memprogram file `README` lagi dan kemudian mengedit file `CONTRIBUTING.md` tanpa melakukan pementasan itu.
+Jika Anda menjalankan perintah `git status` Anda, Anda sekali lagi akan melihat sesuatu seperti ini:
+
+[source,console]
+----
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+----
+
+Untuk melihat apa yang telah Anda ubah tapi belum dipentaskan, ketik `git diff` tanpa argumen lain:
+
+[source,console]
+----
+$ git diff
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index 3cb747f..e445e28 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -36,6 +36,10 @@ def main
+           @commit.parents[0].parents[0].parents[0]
+         end
+
++        run_code(x, 'commits 1') do
++          git.commits.size
++        end
++
+         run_code(x, 'commits 2') do
+           log = git.commits('master', 15)
+           log.size
+----
+
+Perintah itu membandingkan apa yang ada di direktori kerja Anda dengan apa yang ada di area stage Anda.
+Hasilnya menunjukkan perubahan yang telah Anda buat yang belum Anda lakukan.
+
+Jika Anda ingin melihat apa yang telah Anda lakukan yang akan masuk ke komit berikutnya, Anda dapat menggunakan `git diff --staged`.
+Perintah ini membandingkan perubahan bertahap Anda dengan komit terakhir Anda:
+
+[source,console]
+----
+$ git diff --staged
+diff --git a/README b/README
+new file mode 100644
+index 0000000..03902a1
+--- /dev/null
++++ b/README
+@@ -0,0 +1,4 @@
++My Project
++
++ This is my project and it is amazing.
++
+----
+
+Penting untuk dicatat bahwa `git diff` dengan sendirinya tidak menunjukkan semua perubahan yang dilakukan sejak komit terakhir Anda - hanya perubahan yang masih belum diketahui.
+Ini bisa membingungkan, karena jika Anda telah melakukan semua perubahan Anda, `git diff` tidak akan memberi Anda output.
+
+Untuk contoh lain, jika Anda menggelar file `CONTRIBUTING.md` dan kemudian mengeditnya, Anda dapat menggunakan `git diff` untuk melihat perubahan pada file yang dipentaskan dan perubahan yang tidak terputus. Jika lingkungan kita terlihat seperti ini:
+
+[source,console]
+----
+$ git add CONTRIBUTING.md
+$ echo '# test line' >> CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    modified:   CONTRIBUTING.md
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+----
+
+Sekarang Anda bisa menggunakan `git diff` untuk melihat apa yang masih belum tergantikan
+
+[source,console]
+----
+$ git diff
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index e445e28..86b2f7c 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -127,3 +127,4 @@ end
+ main()
+
+ ##pp Grit::GitRuby.cache_client.stats
++# test line
+----
+
+dan `git diff --cached` untuk melihat apa yang telah Anda lakukan selama ini:
+
+[source,console]
+----
+$ git diff --cached
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index 3cb747f..e445e28 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -36,6 +36,10 @@ def main
+          @commit.parents[0].parents[0].parents[0]
+        end
+
++        run_code(x, 'commits 1') do
++          git.commits.size
++        end
++
+        run_code(x, 'commits 2') do
+          log = git.commits('master', 15)
+          log.size
+----
+
+[[_git_difftool]]
+[CATATAN]
+.Git Diff di Alat Eksternal
+====
+Kami akan terus menggunakan perintah `git diff` dengan berbagai cara sepanjang sisa buku ini. Ada cara lain untuk melihat perbedaan ini jika Anda lebih memilih program tampilan grafis atau eksternal. Jika Anda menjalankan `git difftool` dan bukan` git diff`, Anda dapat melihat perbedaan antara perangkat lunak seperti Araxis, emerge, vimdiff dan lainnya. Jalankan `git difftool --tool-help` untuk melihat apa yang tersedia di sistem Anda.
+====
+
+[[_committing_changes]]
+==== Melakukan Perubahan Anda
+
+Setelah area pementasan Anda diatur seperti yang Anda inginkan, Anda dapat melakukan perubahan Anda.
+Ingatlah bahwa apapun yang masih belum ada - file yang telah Anda buat atau modifikasi sehingga Anda belum menjalankan `git add` sejak Anda mengeditnya - tidak akan masuk ke komit ini.
+Mereka akan tetap sebagai file yang dimodifikasi pada disk Anda.
+Dalam kasus ini, katakanlah bahwa terakhir kali Anda menjalankan `status git`, Anda melihat semuanya telah dimulai, jadi Anda siap untuk melakukan perubahan Anda.(((Perintah git, status)))
+Cara termudah untuk melakukan commit adalah dengan mengetik `git commit`:(((git commands, commit)))
+
+[source,console]
+----
+$ git commit
+----
+
+Melakukan hal itu meluncurkan editor pilihan Anda.
+(Ini diatur oleh variabel lingkungan `$ EDITOR` shell Anda - biasanya vim atau emacs, walaupun Anda dapat mengkonfigurasinya dengan apapun yang Anda inginkan dengan menggunakan perintah` git config --global core.editor` seperti yang Anda lihat di <<_getting_started>>) (((editor, ubah default)))(((perintah git, config)))
+
+Editor menampilkan teks berikut (contoh ini adalah layar Vim):
+[source]
+----
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#	new file:   README
+#	modified:   CONTRIBUTING.md
+#
+~
+~
+~
+".git/COMMIT_EDITMSG" 9L, 283C
+----
+
+Anda dapat melihat bahwa pesan komit default berisi keluaran terakhir dari perintah `git status` yang dikomentari dan satu baris kosong di atas.
+Anda dapat menghapus komentar ini dan mengetikkan pesan komit Anda, atau Anda dapat membiarkannya berada di sana untuk membantu Anda mengingat apa yang Anda lakukan.
+(Untuk pengingat yang lebih eksplisit lagi tentang apa yang telah Anda modifikasi, Anda bisa melewatkan opsi `-v` ke` git commit`.
+Melakukan hal itu juga menempatkan perbedaan perubahan Anda dalam editor sehingga Anda dapat melihat dengan tepat perubahan apa yang Anda lakukan.)
+Saat Anda keluar dari editor, Git membuat komit Anda dengan pesan komit tersebut (dengan komentar dan perbedaannya dilucuti).
+
+Sebagai alternatif, Anda dapat mengetikkan pesan komit Anda sesuai dengan perintah `commit` dengan menentukannya setelah sebuah flag-m, seperti ini:
+
+[source,console]
+----
+$ git commit -m "Story 182: Fix benchmarks for speed"
+[master 463dc4f] Story 182: Fix benchmarks for speed
+ 2 files changed, 2 insertions(+)
+ create mode 100644 README
+----
+
+Sekarang Anda telah membuat komit pertama Anda!
+Anda dapat melihat bahwa komit telah memberi Anda beberapa output tentang dirinya sendiri: cabang mana yang Anda komit terhadap (`master`), apa yang SHA-1 checksum komit memiliki (` 463dc4f`), berapa banyak file yang telah diubah, dan statistik tentang garis yang ditambahkan dan dihapus dalam komit.
+
+Ingat bahwa komit merekam snapshot yang Anda siapkan di area stage Anda.
+Apa pun yang tidak Anda panggungkan masih duduk di sana dimodifikasi; Anda dapat melakukan komit lain untuk menambahkannya ke riwayat Anda.
+Setiap kali Anda melakukan komit, Anda merekam cuplikan proyek yang dapat Anda kembalikan atau bandingkan nanti.
+
+==== Melewati Area Stadium
+
+(((area pementasan, skipping)))
+Meskipun bisa sangat berguna untuk membuat kerajinan yang sesuai dengan keinginan Anda, area pementasan terkadang sedikit lebih rumit daripada yang Anda butuhkan dalam alur kerja Anda.
+Jika Anda ingin melewatkan area pementasan, Git menyediakan jalan pintas sederhana.
+Menambahkan opsi `-a` ke perintah` git commit` membuat Git secara otomatis melakukan stage pada setiap file yang sudah dilacak sebelum melakukan commit, membiarkan anda melewatkan bagian `git add`:
+
+[source,console]
+----
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+$ git commit -a -m 'added new benchmarks'
+[master 83e38c7] added new benchmarks
+ 1 file changed, 5 insertions(+), 0 deletions(-)
+----
+
+Perhatikan bagaimana Anda tidak perlu menjalankan `git add` pada file ``CONTRIBUTING.md '' dalam kasus ini sebelum Anda melakukan komit.
+
+[[_removing_files]]
+==== Menghapus file
+
+((file, hapus)))
+Untuk menghapus file dari Git, Anda harus menghapusnya dari file yang dilacak (lebih tepatnya, keluarkan dari area stage) dan kemudian komit.
+Perintah `git rm` melakukan itu, dan juga menghapus file dari direktori kerja Anda sehingga Anda tidak melihatnya sebagai file yang tidak terlacak saat berikutnya.
+
+Jika Anda cukup menghapus file dari direktori kerja Anda, itu muncul di bawah area ``Changed but not updated'' (yaitu, _unstaged_) dari output `git status` Anda:
+
+[source,console]
+----
+$ rm grit.gemspec
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    deleted:    grit.gemspec
+
+no changes added to commit (use "git add" and/or "git commit -a")
+----
+
+Kemudian, jika Anda menjalankan `git rm`, maka tahapan penghapusan file:
+
+[source,console]
+----
+$ git rm grit.gemspec
+rm 'grit.gemspec'
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    deleted:    grit.gemspec
+----
+
+Lain kali Anda berkomitmen, file akan hilang dan tidak lagi dilacak.
+Jika Anda memodifikasi file dan menambahkannya ke indeks, Anda harus memaksa penghapusan dengan opsi `-f`.
+Ini adalah fitur keamanan untuk mencegah pemindahan data yang tidak disengaja yang belum tercatat dalam snapshot dan tidak dapat dipulihkan dari Git.
+
+Hal lain yang mungkin ingin Anda lakukan adalah menyimpan file di pohon kerja Anda tapi menghapusnya dari area stage Anda.
+Dengan kata lain, Anda mungkin ingin menyimpan file di hard drive Anda namun tidak memiliki Git untuk melacaknya lagi.
+Ini sangat berguna jika Anda lupa menambahkan sesuatu ke file `gitignore` dan secara tidak sengaja menggagalkannya, seperti file log besar atau sekumpulan berkas `.a` yang dikompilasi.
+Untuk melakukannya, gunakan opsi `--cached`:
+
+[source,console]
+----
+$ git rm --cached README
+----
+
+Anda bisa melewati file, direktori, dan pola file-glob ke perintah `git rm`.
+Itu berarti Anda bisa melakukan hal seperti
+
+[source,console]
+----
+$ git rm log/\*.log
+----
+
+Perhatikan garis miring terbalik (`\`) di depan `*`.
+Hal ini diperlukan karena Git melakukan perluasan filename sendiri selain perluasan nama file shell Anda.
+Perintah ini menghapus semua file yang memiliki ekstensi `.log` di direktori `log/`.
+Atau, Anda bisa melakukan sesuatu seperti ini:
+
+[source,console]
+----
+$ git rm \*~
+----
+
+Perintah ini menghapus semua file yang diakhiri dengan `~`.
+
+[[_git_mv]]
+==== Memindahkan File
+
+(((file, bergerak)))
+Tidak seperti banyak sistem VCS lainnya, Git tidak secara eksplisit melacak pergerakan file.
+Jika Anda mengganti nama file di Git, tidak ada metadata yang disimpan di Git yang memberitahukan bahwa Anda mengganti namanya menjadi berkas.
+Namun, Git cukup pintar memikirkan hal itu setelah fakta - kita akan menangani gerakan file pendeteksian sedikit kemudian.
+
+Jadi agak membingungkan bahwa Git memiliki perintah `mv`.
+Jika Anda ingin mengganti nama file di Git, Anda dapat menjalankan sesuatu seperti
+
+[source,console]
+----
+$ git mv file_from file_to
+----
+
+dan hasilnya bagus.
+Sebenarnya, jika Anda menjalankan sesuatu seperti ini dan melihat statusnya, Anda akan melihat bahwa Git menganggapnya sebagai file berganti nama:
+
+[source,console]
+----
+$ git mv README.md README
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    renamed:    README.md -> README
+----
+
+Namun, ini setara dengan menjalankan sesuatu seperti ini:
+
+[source,console]
+----
+$ mv README.md README
+$ git rm README.md
+$ git add README
+----
+
+Git mengetahui bahwa itu adalah sebuah perubahan nama secara implisit, jadi tidak masalah jika Anda mengganti nama file dengan cara itu atau dengan perintah `mv`.
+Satu-satunya perbedaan nyata adalah bahwa `mv` adalah satu perintah, bukan tiga - ini adalah fungsi kenyamanan.
+Yang lebih penting, Anda bisa menggunakan alat yang ingin Anda ganti nama file, dan atur add/rm nanti, sebelum Anda komit.
